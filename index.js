@@ -8,9 +8,10 @@ const cred = require('./config.json');
   const page = await browser.newPage();
   await page.goto('https://amplify.fortinet.com');
 
-  // click login button
-  await page.waitFor('button.adv-btn');
-  await page.click('button.adv-btn');
+  // click let's go button
+  const letGoBtnSelector = 'button.adv-btn';
+  await page.waitFor(letGoBtnSelector);
+  await page.click(letGoBtnSelector);
 
   // new page opened
   const newTarget = await browser.waitForTarget(target => {
@@ -20,11 +21,31 @@ const cred = require('./config.json');
 
   console.log('logging in...');
   // login
-  await loginPage.waitFor('input.submit');
+  const loginBtnSelector = 'input.submit';
+  await loginPage.waitFor(loginBtnSelector);
   await loginPage.type('#id_username', cred.username);
   await loginPage.type('#id_password', cred.password);
-  await loginPage.click('input.submit');
+  await loginPage.click(loginBtnSelector);
+
+
+  // Seems like there's a max. for this
+  const likeBtnSelector = '.action-bar__like-icon';
+  await page.waitFor(likeBtnSelector);
+  for (let i = 1; i <= 3; i++) {
+    await page.click(likeBtnSelector);
+    await page.waitFor(2000);
+    await page.click(likeBtnSelector);
+    await page.waitFor(2000);
+  }
+
+  // Don't want to reshare...
+  // const shareBtnXpath = '.content-card__action-bar .action-bar__share__icon:not(.action-bar__share__icon--shared)';
+  // await page.waitFor(shareIconSelector);
+  // const allShareBtns = await page.$$(shareIconSelector);
+
 
   await page.waitFor(5000);
+
+
   browser.close();
 })();
