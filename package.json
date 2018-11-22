@@ -1,0 +1,11 @@
+{
+  "name": "Hack-Fortinet-Amplify",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/kelvinau/Hack-Fortinet-Amplify",
+  "author": "Kelvin Au",
+  "license": "MIT",
+  "dependencies": {
+    "puppeteer": "^1.10.0"
+  }
+}
