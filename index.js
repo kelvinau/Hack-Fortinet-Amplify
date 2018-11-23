@@ -8,39 +8,39 @@ const cred = require('./config.json');
   const page = await browser.newPage();
   await page.goto('https://amplify.fortinet.com');
 
-  // click let's go button
-  const letGoBtnSelector = 'button.adv-btn';
-  await page.waitFor(letGoBtnSelector);
-  await page.click(letGoBtnSelector);
-
-  // new page opened
-  const newTarget = await browser.waitForTarget(target => {
-    return target.url().includes('fac.corp.fortinet.com');
-  });
-  const loginPage = await newTarget.page();
-
-  console.log('logging in...');
-  // login
-  const loginBtnSelector = 'input.submit';
-  await loginPage.waitFor(loginBtnSelector);
-  await loginPage.type('#id_username', cred.username);
-  await loginPage.type('#id_password', cred.password);
-  await loginPage.click(loginBtnSelector);
-
-
-  // Seems like there's a max. for this
-  const likeBtnSelector = '.action-bar__like-icon';
-  await page.waitFor(likeBtnSelector);
-  for (let i = 1; i <= 3; i++) {
-    await page.click(likeBtnSelector);
-    await page.waitFor(2000);
-    await page.click(likeBtnSelector);
-    await page.waitFor(2000);
-    console.log(`clicked ${i}`);
-  }
-
-  // Don't want to reshare...
   try {
+    // click let's go button
+    const letGoBtnSelector = 'button.adv-btn';
+    await page.waitFor(letGoBtnSelector);
+    await page.click(letGoBtnSelector);
+
+    // new page opened
+    const newTarget = await browser.waitForTarget(target => {
+      return target.url().includes('fac.corp.fortinet.com');
+    });
+    const loginPage = await newTarget.page();
+
+    console.log('logging in...');
+    // login
+    const loginBtnSelector = 'input.submit';
+    await loginPage.waitFor(loginBtnSelector);
+    await loginPage.type('#id_username', cred.username);
+    await loginPage.type('#id_password', cred.password);
+    await loginPage.click(loginBtnSelector);
+
+
+    // Seems like there's a max. for this
+    const likeBtnSelector = '.action-bar__like-icon';
+    await page.waitFor(likeBtnSelector);
+    for (let i = 1; i <= 10; i++) {
+      await page.click(likeBtnSelector);
+      await page.waitFor(2000);
+      await page.click(likeBtnSelector);
+      await page.waitFor(2000);
+      console.log(`clicked ${i}`);
+    }
+
+    // Don't want to reshare...
     const shareBtnSelector = '.action-bar__share';
     const linkSelector = '.modal-wrapper .nav-link';
     const loaderSelector = '.loader-ctn';
@@ -78,9 +78,13 @@ const cred = require('./config.json');
       await page.click('.modal-wrapper svg.panel__header__close__icon');
     }
   }
-  catch(e) {}
+  catch(e) {
+    console.log(e);
+  }
 
   await page.waitFor(5000);
 
   browser.close();
+
+  console.log('ended');
 })();
