@@ -36,16 +36,51 @@ const cred = require('./config.json');
     await page.waitFor(2000);
     await page.click(likeBtnSelector);
     await page.waitFor(2000);
+    console.log(`clicked ${i}`);
   }
 
   // Don't want to reshare...
-  // const shareBtnXpath = '.content-card__action-bar .action-bar__share__icon:not(.action-bar__share__icon--shared)';
-  // await page.waitFor(shareIconSelector);
-  // const allShareBtns = await page.$$(shareIconSelector);
+  try {
+    const shareBtnSelector = '.action-bar__share';
+    const linkSelector = '.modal-wrapper .nav-link';
+    const loaderSelector = '.loader-ctn';
+    const modalShareSelector = '.modal-wrapper .share__actions__button';
 
+    await page.waitFor(shareBtnSelector);
+    const shareBtn = await page.$(shareBtnSelector);
+    // only check one post
+    await shareBtn.click();
+    await page.waitFor(linkSelector);
+    const links = await page.$$(linkSelector);
+
+    await page.waitFor(5000);
+
+    await Promise.all([
+      page.click('.modal-wrapper .nav-link:not(.active)'),
+      // page.waitFor(loaderSelector),
+    ])
+
+    // await page.waitFor('.loader-ctn', {
+    // hidden: true,
+    // });
+
+    await page.waitFor(5000);
+
+    const notShared = await page.$('.loader-no-content');
+    if (notShared) {
+      console.log('sharing...');
+      await page.click('.modal-wrapper .nav-link:not(.active)');
+      await page.waitFor(modalShareSelector);
+      await page.click(modalShareSelector);
+    }
+    else {
+      console.log('shared already');
+      await page.click('.modal-wrapper svg.panel__header__close__icon');
+    }
+  }
+  catch(e) {}
 
   await page.waitFor(5000);
-
 
   browser.close();
 })();
