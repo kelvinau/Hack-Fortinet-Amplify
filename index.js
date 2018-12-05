@@ -3,7 +3,7 @@ const cred = require('./config.json');
 
 (async function() {
   const browser = await puppeteer.launch({
-    // headless: false,
+    headless: false,
   });
   const page = await browser.newPage();
   await page.goto('https://amplify.fortinet.com');
@@ -47,35 +47,41 @@ const cred = require('./config.json');
     const modalShareSelector = '.modal-wrapper .share__actions__button';
 
     await page.waitFor(shareBtnSelector);
-    const shareBtn = await page.$(shareBtnSelector);
-    // only check one post
-    await shareBtn.click();
-    await page.waitFor(linkSelector);
-    const links = await page.$$(linkSelector);
+    const shareBtn = await page.$$(shareBtnSelector);
 
-    await page.waitFor(5000);
+    for (let btn of shareBtn) {
+      // only check one post
+      await btn.click();
+      await page.waitFor(linkSelector);
+      const links = await page.$$(linkSelector);
 
-    await Promise.all([
-      page.click('.modal-wrapper .nav-link:not(.active)'),
-      // page.waitFor(loaderSelector),
-    ])
+      await page.waitFor(5000);
 
-    // await page.waitFor('.loader-ctn', {
-    // hidden: true,
-    // });
+      await Promise.all([
+        page.click('.modal-wrapper .nav-link:not(.active)'),
+        // page.waitFor(loaderSelector),
+      ])
 
-    await page.waitFor(5000);
+      // await page.waitFor('.loader-ctn', {
+      // hidden: true,
+      // });
 
-    const notShared = await page.$('.loader-no-content');
-    if (notShared) {
-      console.log('sharing...');
-      await page.click('.modal-wrapper .nav-link:not(.active)');
-      await page.waitFor(modalShareSelector);
-      await page.click(modalShareSelector);
-    }
-    else {
-      console.log('shared already');
-      await page.click('.modal-wrapper svg.panel__header__close__icon');
+      await page.waitFor(5000);
+
+      const notShared = await page.$('.loader-no-content');
+      if (notShared) {
+        console.log('sharing...');
+        await page.click('.modal-wrapper .nav-link:not(.active)');
+        await page.waitFor(modalShareSelector);
+        await page.click(modalShareSelector);
+        // wait for notification to go away
+        await page.waitFor(8000);
+      }
+      else {
+        console.log('shared already');
+        await page.click('.modal-wrapper svg.panel__header__close__icon');
+      }
+      await page.waitFor(2000);
     }
   }
   catch(e) {
