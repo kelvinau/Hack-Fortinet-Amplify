@@ -32,7 +32,7 @@ const cred = require('./config.json');
     // Seems like there's a max. for this
     const likeBtnSelector = '.action-bar__like-icon';
     await page.waitFor(likeBtnSelector);
-    for (let i = 1; i <= 10; i++) {
+    for (let i = 1; i <= 9; i++) {
       await page.click(likeBtnSelector);
       await page.waitFor(2000);
       await page.click(likeBtnSelector);
