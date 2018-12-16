@@ -39,26 +39,31 @@ const cred = require('./config.json');
     for (let i = 0; i < tabIndex.length; i++) {
       console.log(`going to tab ${tabIndex[i]}...`);
       await tabBtn[tabIndex[i]].click();
-      await browseEachTab();
+      await browseEachTab(i);
     }
 
-    async function browseEachTab() {
-      // Seems like there's a max. for this
-      const likeBtnSelector = '.action-bar__like-icon';
-      await page.waitFor(likeBtnSelector);
-      for (let i = 1; i <= 9; i++) {
-        await page.click(likeBtnSelector);
-        await page.waitFor(2000);
-        await page.click(likeBtnSelector);
-        await page.waitFor(2000);
-        console.log(`clicked ${i}`);
+    async function browseEachTab(index) {
+      // only for the first tab
+      if (!index) {
+        // Seems like there's a max. for this
+        const likeBtnSelector = '.action-bar__like-icon';
+        await page.waitFor(likeBtnSelector);
+
+        for (let i = 1; i <= 9; i++) {
+          await page.click(likeBtnSelector);
+          await page.waitFor(2000);
+          await page.click(likeBtnSelector);
+          await page.waitFor(2000);
+          console.log(`clicked ${i}`);
+        }
       }
 
       // Don't want to reshare...
-      const shareBtnSelector = '.action-bar__share';
-      const linkSelector = '.modal-wrapper .nav-link';
+      const shareBtnSelector = '.tab-pane.active .action-bar__share';
+      const linkSelector = '.tab-pane.active .modal-wrapper .nav-link';
       const loaderSelector = '.loader-ctn';
-      const modalShareSelector = '.modal-wrapper .share__actions__button';
+      const modalShareSelector =
+        '.tab-pane.active .modal-wrapper .share__actions__button';
 
       await page.waitFor(shareBtnSelector);
       const shareBtn = await page.$$(shareBtnSelector);
@@ -72,7 +77,7 @@ const cred = require('./config.json');
         await page.waitFor(5000);
 
         await Promise.all([
-          page.click('.modal-wrapper .nav-link:not(.active)'),
+          page.click('.tab-pane.active .modal-wrapper .nav-link:not(.active)'),
           // page.waitFor(loaderSelector),
         ]);
 
@@ -85,14 +90,18 @@ const cred = require('./config.json');
         const notShared = await page.$('.loader-no-content');
         if (notShared) {
           console.log('sharing...');
-          await page.click('.modal-wrapper .nav-link:not(.active)');
+          await page.click(
+            '.tab-pane.active .modal-wrapper .nav-link:not(.active)'
+          );
           await page.waitFor(modalShareSelector);
           await page.click(modalShareSelector);
           // wait for notification to go away
           await page.waitFor(8000);
         } else {
           console.log('shared already');
-          await page.click('.modal-wrapper svg.panel__header__close__icon');
+          await page.click(
+            '.tab-pane.active .modal-wrapper svg.panel__header__close__icon'
+          );
         }
         await page.waitFor(2000);
       }
