@@ -1,9 +1,10 @@
 const puppeteer = require('puppeteer');
 const cred = require('./config.json');
+const DEBUG = false;
 
 (async function() {
   const browser = await puppeteer.launch({
-    //headless: false,
+    headless: !DEBUG,
   });
   const page = await browser.newPage();
 
@@ -59,51 +60,27 @@ const cred = require('./config.json');
       }
 
       // Don't want to reshare...
-      const shareBtnSelector = '.tab-pane.active .action-bar__share';
-      const linkSelector = '.tab-pane.active .modal-wrapper .nav-link';
-      const loaderSelector = '.loader-ctn';
+      const allShareBtnSelector = '//div[contains(@class, "tab-pane active")]// *[name()="svg" and contains(@class, "action-bar__share__icon")]/..';
+      const shareBtnSelector = '//div[contains(@class, "tab-pane active")]// *[name()="svg" and contains(@class, "action-bar__share__icon") and not(contains(@class, "action-bar__share__icon--shared"))]/..';
+
       const modalShareSelector =
         '.tab-pane.active .modal-wrapper .share__actions__button';
 
-      await page.waitFor(shareBtnSelector);
-      const shareBtn = await page.$$(shareBtnSelector);
+      await page.waitFor(allShareBtnSelector);
+      const shareBtn = await page.$x(shareBtnSelector);
 
       for (let btn of shareBtn) {
         // only check one post
         await btn.click();
-        await page.waitFor(linkSelector);
-        const links = await page.$$(linkSelector);
-
         await page.waitFor(5000);
 
-        await Promise.all([
-          page.click('.tab-pane.active .modal-wrapper .nav-link:not(.active)'),
-          // page.waitFor(loaderSelector),
-        ]);
+        console.log('sharing...');
+        await page.waitFor(modalShareSelector);
+        await page.click(modalShareSelector);
+        // wait for notification to go away
+        await page.waitFor(8000);
 
-        // await page.waitFor('.loader-ctn', {
-        // hidden: true,
-        // });
-
-        await page.waitFor(5000);
-
-        const notShared = await page.$('.loader-no-content');
-        if (notShared) {
-          console.log('sharing...');
-          await page.click(
-            '.tab-pane.active .modal-wrapper .nav-link:not(.active)'
-          );
-          await page.waitFor(modalShareSelector);
-          await page.click(modalShareSelector);
-          // wait for notification to go away
-          await page.waitFor(8000);
-        } else {
-          console.log('shared already');
-          await page.click(
-            '.tab-pane.active .modal-wrapper svg.panel__header__close__icon'
-          );
-        }
-        await page.waitFor(2000);
+        await page.waitFor(DEBUG ? 10000 : 2000);
       }
     }
   } catch (e) {
@@ -112,7 +89,7 @@ const cred = require('./config.json');
 
   await page.waitFor(5000);
 
-  browser.close();
+  !DEBUG && browser.close();
 
   console.log('ended');
 })();
