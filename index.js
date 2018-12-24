@@ -1,6 +1,6 @@
+const DEBUG = process.argv.length === 3 && process.argv[2] === 'DEBUG';
 const puppeteer = require('puppeteer');
 const cred = require('./config.json');
-const DEBUG = false;
 
 (async function() {
   const browser = await puppeteer.launch({
