@@ -45,7 +45,7 @@ const cred = require('./config.json');
 
     async function browseEachTab(index) {
       // only for the first tab
-      if (!index) {
+      if (!DEBUG && !index) {
         // Seems like there's a max. for this
         const likeBtnSelector = '.action-bar__like-icon';
         await page.waitFor(likeBtnSelector);
@@ -70,6 +70,7 @@ const cred = require('./config.json');
       const shareBtn = await page.$x(shareBtnSelector);
 
       for (let btn of shareBtn) {
+        DEBUG && console.log('clicked a share button')
         // only check one post
         await btn.click();
         await page.waitFor(5000);
