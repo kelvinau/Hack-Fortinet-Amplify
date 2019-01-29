@@ -76,7 +76,13 @@ const cred = require('./config.json');
         await page.waitFor(5000);
 
         console.log('sharing...');
-        await page.waitFor(modalShareSelector);
+        try{
+          await page.waitFor(modalShareSelector);
+        }
+        catch(e) {
+          console.log(e);
+          console.log('share button not found; maybe not a linkedin post')
+        }
         await page.click(modalShareSelector);
         // wait for notification to go away
         await page.waitFor(8000);
