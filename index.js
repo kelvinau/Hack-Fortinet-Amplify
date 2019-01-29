@@ -75,15 +75,17 @@ const cred = require('./config.json');
         await btn.click();
         await page.waitFor(5000);
 
-        console.log('sharing...');
         try{
           await page.waitFor(modalShareSelector);
+          await page.click(modalShareSelector);
+          console.log('shared');
         }
         catch(e) {
           console.log(e);
-          console.log('share button not found; maybe not a linkedin post')
+          console.log('\nshare button not found; maybe not a linkedin post');
+          // close the modal
+          await page.click('.tab-pane.active .panel__header__close');
         }
-        await page.click(modalShareSelector);
         // wait for notification to go away
         await page.waitFor(8000);
 
